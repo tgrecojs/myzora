@@ -1,0 +1,10 @@
+.DS_STORE
+
+.env.development
+.env.local
+.env.production
+.env
+
+node_modules
+.next/*
+
