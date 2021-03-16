@@ -20,6 +20,7 @@
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",
     "@metamask/detect-provider": "^1.2.0",
+    "@zoralabs/zdk": "^1.0.7",
     "autodux": "^5.0.3",
     "emotion-theming": "^11.0.0",
     "fortmatic": "^2.2.1",
