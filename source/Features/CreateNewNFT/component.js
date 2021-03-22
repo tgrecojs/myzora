@@ -6,7 +6,7 @@ import { send, setForm } from "./reducer";
 
 const noop = () => {};
 
-const CreateNewNFT = (props) => {
+const CreateNewNFT = () => {
   const { form } = useSelector((state) => state.formState);
   console.log("form in creattenewNFT", form);
   console.log("setform", setForm());
