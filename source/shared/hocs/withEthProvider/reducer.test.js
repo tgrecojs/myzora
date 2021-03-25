@@ -1,13 +1,15 @@
 import { describe } from "riteway";
 import render from "riteway/render-component";
 import {
-  fetchMetamaskProvider,
+  fetchProvider,
   reportError,
   reportSuccess,
   handleError,
   reducer,
-  txnStatus,
-  txnPayload,
+  FETCHING,
+  SUCCESS,
+  ERROR,
+  IDLE,
 } from "./reducer";
 
 const defaultState = {
@@ -18,12 +20,12 @@ const defaultState = {
 const createState = (state = defaultState) => ({ ...state });
 
 describe("metamaskProviderReducer", async (assert) => {
-  const setup = reducer();
+  const setup = reducer(undefined);
   assert({
     given: "no arguments",
     should: "have a status idle",
-    actual: reducer(),
-    expected: {}
+    actual: setup.status === "idle",
+    expected: true,
   });
 
   assert({
@@ -32,13 +34,36 @@ describe("metamaskProviderReducer", async (assert) => {
     actual: setup.payload.toString() === { type: "empty" }.toString(),
     expected: true,
   });
-  {
-    const setup = reducer(undefined , reducer())
-    assert({
-      given: "fetchProvider action",
-      should: "have a status of fetching",
-      actual: reducer(setup, fetchMetamaskProvider()),
-      expected: {status: "fetching provider" },
-    });
-  }
+
+  const fetchSetup = reducer(setup, fetchProvider());
+  assert({
+    given: "fetchProvider action",
+    should: "have a status of fetching",
+    actual: fetchSetup.status === "fetching provider",
+    expected: true,
+  });
+
+  const testResponse = {
+    _state: { chain: 0 },
+  };
+  const successSetup = reducer(fetchSetup, reportSuccess(testResponse));
+  assert({
+    given: "reportSuccess action",
+    should: "transition to a status of success",
+    actual: successSetup.status === "success",
+    expected: true,
+  });
+  assert({
+    given: "reportSuccess action",
+    should: "update the payload object with response data",
+    actual: successSetup.payload.toString() === testResponse.toString(),
+    expected: true,
+  });
+
+  assert({
+    given: "reportError action",
+    should: "should not work when status is success",
+    actual: reducer(successSetup, reportError()).status === 'success',
+    expected: true,
+  });
 });
