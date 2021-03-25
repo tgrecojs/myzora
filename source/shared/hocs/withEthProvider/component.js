@@ -1,22 +1,20 @@
 import { useEffect } from "react";
-import detectEthereumProvider from "@metamask/detect-provider";
 
-const withWeb3Provider = (Component) => (props) => {
+const initEthProvider = async () => {
+  const response = await detectEthereumProvider();
+  /**
+   * { selectedAddress: "0x80b2b6acbb2744859c04c7da78373dc62f523398"
+networkVersion(pin): "1"
+chainId(pin): "0x1"
+_state,
+
+*/
+  return response;
+};
+
+const withWeb3Provider = (Component) => ({ onConnectProvider, ...props }) => {
   useEffect(() => {
-    async function initEthProvider() {
-      const provider = await detectEthereumProvider();
-      if (provider) {
-        console.log("setting provider ###", provider, {
-          providerIsEth: provider === window.ethereum,
-        });
-        props.setEthProvider(provider);
-      } else {
-        props.setEthProviderError(
-          "Minting NFTs requires your browser to have the Metamask extension installed!"
-        );
-      }
-    }
-    initEthProvider();
+    onConnectProvider();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { compose } from "ramda";
 import { FormWrapper } from "../../shared/styled";
-import { send, setForm } from "./reducer";
 
 const noop = () => {};
 
-const CreateNewNFT = () => {
-  const { form } = useSelector((state) => state.formState);
-  console.log("form in creattenewNFT", form);
-  console.log("setform", setForm());
+const CreateNewNFT = ({
+  defaultName = "Default NFT Name",
+  defaultPrice = 0,
+  defaultTokenUri = "",
+  onSubmit,
+  status,
+}) => {
   const dispatch = useDispatch();
   // console.log("dispatch", dispatch);
   // const initForm = compose(dispatch, setForm);
@@ -17,7 +19,7 @@ const CreateNewNFT = () => {
   const [nftName, setNftName] = useState("");
   const [price, setPrice] = useState(0);
   const [tokenURI, setTokenURI] = useState("");
-  const [tempForm, setTempForm] = useState(form);
+
 
   const setter = (set) => (e) => {
     const { target } = e;
@@ -25,16 +27,14 @@ const CreateNewNFT = () => {
     console.log({ value });
     set(value);
   };
-  // const sendTransaction = compose(dispatch, send);
-  function handleSubmit(e) {
-    e.preventDefault();
-    const newForm = { nftName, price, tokenURI };
-    //dispatch setform
-    setTempForm({ ...tempForm, newForm });
-    dispatch({ type: setForm().type, payload: newForm });
-    console.log("newform data", newForm);
-  }
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ nftName, price, tokenURI });
+    setNftName("");
+    setPrice("");
+    setTokenURI("");
+  };
   return (
     <FormWrapper as="form" onSubmit={handleSubmit} py={3}>
       <label htmlFor="name">NFT Name</label>
@@ -61,12 +61,7 @@ const CreateNewNFT = () => {
         type="text"
         onChange={setter(setTokenURI)}
       />
-      <button
-        bg="blue"
-        onClick={() => {
-          console.log("sending values", { nftName, price, tokenURI });
-        }}
-      >
+      <button bg="blue" type="submit">
         Send Transaction
       </button>
     </FormWrapper>

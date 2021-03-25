@@ -1,22 +1,21 @@
 import { call, put, takeLatest } from "redux-saga/effects";
-import { setForm, send, getForm } from "./reducer";
+import { sendTransaction, getForm } from "./reducer";
 import { requestEthAccount } from "../../shared/api/eth";
 //api req for zora
-const delay = setTimeout(() => {
-  console.log("timing");
-}, 1000);
-export function* formListenerSaga() {
+const callFleekApi = (x) => new Promise((res) => res(x)).then((x) => x);
+
+export function* formListenerSaga(action) {
   try {
-    const [response] = yield call(delay);
+    const response = yield call(callFleekApi, action.payload);
     console.log("response in listener", response);
-    yield put(response);
+    yield put({ type: "SOME_ACTION", payload: response });
   } catch (error) {
     yield console.log("error");
   }
 }
 
 function* watchFetchMetamaskAccount() {
-  yield takeLatest(setForm().type, formListenerSaga);
+  yield takeLatest(sendTransaction().type, formListenerSaga);
 }
 
 export default watchFetchMetamaskAccount;

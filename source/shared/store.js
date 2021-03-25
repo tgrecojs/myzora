@@ -1,7 +1,7 @@
 import { combineReducers, createStore, applyMiddleware } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { reducer as ethProviderReducer } from "./hocs/withEthProvider/reducer";
-import { reducer as metamaskWalletReducer } from "../Features/ConnectWallet/reducer";
+import { web3Reducer as metamaskWalletReducer } from "./hocs/withEthProvider/reducer";
 import { reducer as formReducer } from "../Features/CreateNewNFT/reducer";
 
 import rootSaga from "./sagas";
@@ -10,7 +10,7 @@ const exampleInitialState = {
   web3State: ethProviderReducer(),
   // transactionState: {...metamaskWalletReducer()},
   metamaskAccountState: { ...metamaskWalletReducer() },
-  formState: formReducer(),
+  sendTransactionState: formReducer(),
 };
 
 export function initializeStore(initialState = exampleInitialState) {
@@ -18,8 +18,7 @@ export function initializeStore(initialState = exampleInitialState) {
   const rootReducer = combineReducers({
     web3State: ethProviderReducer,
     metamaskAccountState: metamaskWalletReducer,
-    // transactionState: metamaskWalletReducer,
-    formState: formReducer,
+    sendTransactionState: formReducer,
   });
   return {
     ...createStore(

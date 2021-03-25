@@ -1,18 +1,61 @@
 import autodux from "autodux";
+import dsm from "redux-dsm";
 
-export const {
-  reducer,
-  initial,
-  slice,
-  actions: { setForm, send, setError: setFormError },
-  selectors: { getForm, getError: getFormError },
-} = autodux({
-  slice: "formData",
-  initial: {
-    form: {},
-    error: null,
-  },
-  actions: {
-    setForm: (state, payload) => ({ ...state, form: payload }),
-  },
+const SUCCESS = "success";
+const SENDING_TRANSACTION = "sending transation";
+const MINTING_TOKEN = "minting token";
+const MINT_ERROR = 'mint token error';
+const MINT_SUCCESS = 'mint token success';
+const ERROR = "error";
+const IDLE = "idle";
+
+const sendTxnStates = [
+  "initial",
+  IDLE,
+  [
+    "send transaction",
+    SENDING_TRANSACTION,
+    ["report error", ERROR, ["handle error", IDLE]],
+    ["report success", SUCCESS, ["handle success", IDLE]],
+  ],
+  [
+    "mint token",
+    MINTING_TOKEN,
+    ["report mint error", MINT_ERROR, ["handle mint error", IDLE]],
+    ["report mint success", MINT_SUCCESS, ["handle mint success", IDLE]],
+  ],
+];
+
+const mintDSM = dsm({
+  component: "CreateNewNFT",
+  description: "send NFT txn",
+  actionStates: sendTxnStates,
 });
+
+const {
+  actionCreators: {
+    sendTransaction,
+    reportError,
+    reportSuccess,
+    handleError,
+    handleSuccess,
+  },
+  reducer,
+} = mintDSM;
+
+const txnPayload = ({ sendTransactionState }) => sendTransactionState.status;
+
+const txnStatus = ({ sendTransactionState }) => sendTransactionState.status;
+
+export {
+  sendTransaction,
+  reportError,
+  reportSuccess,
+  handleError,
+  handleSuccess,
+  reducer,
+  txnStatus,
+  txnPayload
+};
+
+export default mintDSM;

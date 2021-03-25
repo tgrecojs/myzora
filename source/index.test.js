@@ -1,1 +1,1 @@
-import "./Features/ConnectWallet/reducer.test";
+import "../source/shared/hocs/withEthProvider/reducer.test"
