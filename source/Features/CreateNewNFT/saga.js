@@ -4,6 +4,10 @@ import {
   reportSuccess,
   reportError,
   handleError,
+  mintToken,
+  reportMintSuccess,
+  reportMintError,
+  handleMintError
 } from "./reducer";
 import fleekStorage from "@fleekhq/fleek-storage-js";
 //api req for zora
@@ -30,11 +34,31 @@ export function* fleekUploadSaga(action) {
     console.log({ payload: action.payload });
     const response = yield call(postToFleekStorage, action.payload);
     console.log("response in listener", response);
-    yield put(reportSuccess(response));
+    yield put(mintToken(response));
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError(error));
   }
+}
+
+const postToZora = () => {
+  const response = {data: 'tom'}
+  return response
+}
+
+export function* mintTokenSaga(action) {
+  try {
+    console.log({ payload: action.payload });
+    const response = yield call(postToZora, action.payload);
+    console.log("response in mintListener", response);
+    yield put(reportMintSuccess(response));
+  } catch (error) {
+    yield put(reportMintError(error));
+    yield put(handleMintError());
+  }
+}
+export function* mintTokenWatcher() {
+  yield takeLatest(mintToken().type, mintTokenSaga);
 }
 
 function* watchFetchMetamaskAccount() {

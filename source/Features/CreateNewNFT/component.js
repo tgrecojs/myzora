@@ -8,7 +8,7 @@ const noop = () => {};
 const CreateNewNFT = ({
   defaultName = "Default NFT Name",
   defaultPrice = 0,
-  defaultTokenUri = "",
+  defaultmediaData = "",
   onSubmit,
   status,
 }) => {
@@ -18,22 +18,29 @@ const CreateNewNFT = ({
 
   const [nftName, setNftName] = useState("");
   const [price, setPrice] = useState(0);
-  const [tokenURI, setTokenURI] = useState("");
-
+  const [mediaData, setMediaData] = useState({});
+  const [fileName, setFileName] = useState("")
 
   const setter = (set) => (e) => {
     const { target } = e;
     const { value } = target;
-    console.log({ value });
+    console.log({ value, e });
     set(value);
+  };
+
+  const setFiles = (set) => (e) => {
+    const { target } = e;
+    const { value } = target;
+    console.log({ value, e, files: value.files });
+    set(value.files[0]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ nftName, price, tokenURI });
+    onSubmit({ nftName, price, tokenUri: mediaData });
     setNftName("");
     setPrice("");
-    setTokenURI("");
+    setMediaData({name: ''});
   };
   return (
     <FormWrapper as="form" onSubmit={handleSubmit} py={3}>
@@ -55,11 +62,17 @@ const CreateNewNFT = ({
       />
       <label htmlFor="price">Token URI (media)</label>
       <input
-        value={tokenURI}
-        id="tokenURI"
-        name="tokenURI"
+        value={fileName}
+        id="mediaData"
+        name="mediaData"
         type="file"
-        onChange={setter(setTokenURI)}
+        onChange={e => {
+          console.log("e.target ####", e.target, e.target.files)
+          const files = e.target.files;
+          setMediaData(files)
+          console.log("files ##", files)
+          setFileName(files[0].name)
+        }}
       />
 
       <button bg="blue" type="submit">

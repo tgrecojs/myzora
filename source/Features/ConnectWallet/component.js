@@ -8,8 +8,6 @@ import { sendTransaction, txnStatus } from "../CreateNewNFT/reducer";
 
 const ConnectWallet = () => {
   const dispatch = useDispatch();
-  const web3State = useSelector(({ web3State }) => web3State);
-  console.log({ web3State });
   const onSendTxn = compose(dispatch, sendTransaction);
 
   return (
