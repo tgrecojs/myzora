@@ -7,6 +7,7 @@ import {
   disconnectWallet,
   handleError,
 } from "./reducer";
+
 // a function to test
 describe("reducer()", async (assert) => {
   const testError = new Error("default error message");
@@ -41,19 +42,19 @@ describe("reducer()", async (assert) => {
   }
   {
     const setup = reducer(undefined, fetchWallet());
-
+    const state = reducer(setup, reportError(payload))
     // reportError & handleError
     const payload = new Error("testing reportError function");
     assert({
       given: "reportError()",
       should: "transition to a status of error",
-      actual: reducer(setup, reportError(payload)).status,
+      actual: state.status,
       expected: "error",
     });
     assert({
       given: "reportError()",
       should: "update the payload with an error message.",
-      actual: reducer(setup, reportError(payload)).payload,
+      actual: state.payload,
       expected: payload,
     });
   }

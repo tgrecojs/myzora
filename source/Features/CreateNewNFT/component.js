@@ -58,9 +58,10 @@ const CreateNewNFT = ({
         value={tokenURI}
         id="tokenURI"
         name="tokenURI"
-        type="text"
+        type="file"
         onChange={setter(setTokenURI)}
       />
+
       <button bg="blue" type="submit">
         Send Transaction
       </button>

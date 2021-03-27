@@ -19,6 +19,7 @@
   "dependencies": {
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",
+    "@fleekhq/fleek-storage-js": "^1.0.14",
     "@metamask/detect-provider": "^1.2.0",
     "@zoralabs/zdk": "^1.0.7",
     "autodux": "^5.0.3",
