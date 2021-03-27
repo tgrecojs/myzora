@@ -14,8 +14,8 @@ export function* formListenerSaga(action) {
     const response = yield call(initEthProvider);
     console.log("response in listener", { response });
     yield put(reportSuccess(response));
-
-    yield put(setUserInfo(response.userData))
+    const userData = yield call(requestEthAccount)
+    yield put(setUserInfo(userData))
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError());

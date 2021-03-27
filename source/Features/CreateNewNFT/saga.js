@@ -34,7 +34,8 @@ export function* fleekUploadSaga(action) {
     console.log({ payload: action.payload });
     const response = yield call(postToFleekStorage, action.payload);
     console.log("response in listener", response);
-    yield put(mintToken(response));
+    yield put(reportSuccess(response));
+    yield put(mintToken())
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError(error));
