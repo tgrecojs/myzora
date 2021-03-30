@@ -1,25 +1,25 @@
 import autodux from "autodux";
 import dsm from "redux-dsm";
 
-const SUCCESS = "success";
-const SENDING_TRANSACTION = "sending transation";
+
+const SEND_DATA = "sending data";
 const MINTING_TOKEN = "minting token";
 const MINT_ERROR = "mint token error";
 const MINT_SUCCESS = "mint token success";
-const ERROR = "error";
+const SEND_ERROR = "send data error";
 const IDLE = "idle";
+const SEND_SUCCESS = "send data success";
 
 const sendTxnStates = [
   "initial",
   IDLE,
   [
     "send transaction",
-    SENDING_TRANSACTION,
-    ["report error", ERROR, ["handle error", IDLE]],
+    SEND_DATA,
+    ["report error", SEND_ERROR, ["handle error", IDLE]],
     [
       "report success",
-      SUCCESS,
-      ["handle success", IDLE],
+      SEND_SUCCESS,
       [
         "mint token",
         MINTING_TOKEN,
@@ -42,23 +42,24 @@ const {
     reportError,
     reportSuccess,
     handleError,
-    handleSuccess,
     mintToken,
     reportMintSuccess,
-    handleMintError,
     reportMintError,
+    handleMintSuccess,
+    handleMintError,
   },
   reducer,
 } = mintDSM;
 
+
 export {
   sendTransaction,
   reportError,
+  reportMintError,
   reportSuccess,
   handleError,
   handleMintError,
-  reportMintError,
-  handleSuccess,
+  handleMintSuccess,
   mintToken,
   reportMintSuccess,
   reducer,

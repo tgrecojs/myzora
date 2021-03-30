@@ -45,21 +45,44 @@ export {
   txnPayload,
 };
 
+const ethNetworkLookup = { 1: "mainnet", 3: "ropsten", 4: "rinkeby" };
+
 export const {
   reducer: web3Reducer,
   initial,
   slice,
-  actions: { setUserInfo, setEthProvider, setError: setEthProviderError },
-  selectors: { getWeb3, getError: getEthProviderError },
+  actions: {
+    setChainId,
+    setWalletAddress,
+    setEthProvider,
+    setError: setEthProviderError,
+    setFleekResponseData,
+    setZoraResponseData,
+  },
+  selectors: {
+    getWalletAddress,
+    getWeb3,
+    getChainId,
+    getError: getEthProviderError,
+    getFleekResponseData,
+    getZoraResponseData,
+  },
 } = autodux({
-  slice: "web3API",
+  slice: "userSessionInformation",
   initial: {
-    payload: null,
     error: null,
-    userInfo: null
+    walletAddress: [],
+    chainId: null,
+    fleekResponseData: {},
+    zoraResponseData: {},
   },
   actions: {
-    setUserInfo: (x) => ({payload: x})
+    setChainId: (state, payload) => ({
+      ...state,
+      chainId: payload,
+      chainName: ethNetworkLookup[parseInt(payload)],
+    }),
+    setUserInfo: (s,x) => ({ ...s, userInfo: x }),
   },
   selectors: {},
 });

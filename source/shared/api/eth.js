@@ -7,19 +7,11 @@ const requestEthAccount = async () => {
   return user;
 };
 
-const blockchainMap = { 1: "mainnet", 3: "ropsten", 4: "rinkely" };
+export const ethNetworkLookup = { 1: "mainnet", 3: "ropsten", 4: "rinkeby" };
 
 const initEthProvider = async () => {
   const response = await detectEthereumProvider();
   const data = await response;
-  /**
-   * { selectedAddress: "0x80b2b6acbb2744859c04c7da78373dc62f523398"
-networkVersion(pin): "1"
-chainId(pin): "0x1"
-_state,
-_rpcEngine
-*/
-  console.log("response ####", { data, _State: data._state });
-  return { web3Provider: data, userData: data._state };
+  return { ...data, address: data.selectedAddress }
 };
 export { requestEthAccount, initEthProvider };

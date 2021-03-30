@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest } from "redux-saga/effects";
 import {
   sendTransaction,
   reportSuccess,
@@ -7,11 +7,22 @@ import {
   mintToken,
   reportMintSuccess,
   reportMintError,
-  handleMintError
+  handleMintError,
 } from "./reducer";
+import {
+  constructMediaData,
+  sha256FromBuffer,
+  generateMetadata,
+  isMediaDataVerified,
+} from "@zoralabs/zdk";
+import {
+  setFleekResponseData,
+  getFleekResponseData,
+  getZoraResponseData,
+} from "../../shared/hocs/withEthProvider/reducer";
 import fleekStorage from "@fleekhq/fleek-storage-js";
 //api req for zora
-const callFleekApi = (x) => new Promise((res) => res(x)).then((x) => x);
+const callZoraApi = (x) => new Promise((res) => res(x)).then((x) => x);
 
 const postToFleekStorage = async ({
   tokenURI = "default file.jpg",
@@ -35,30 +46,50 @@ export function* fleekUploadSaga(action) {
     const response = yield call(postToFleekStorage, action.payload);
     console.log("response in listener", response);
     yield put(reportSuccess(response));
-    yield put(mintToken())
+    yield put(setFleekResponseData(response));
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError(error));
   }
 }
 
-const postToZora = () => {
-  const response = {data: 'tom'}
-  return response
-}
+const constructNft = ({
+  tokenUri = "default ipfs token uri",
+  metadataUri = "default ipfs metdata uri",
+  contentHash = "default content hash",
+  fileMetadata,
+}) => ({
+  tokenUri,
+  metadataUri,
+  contentHash: sha256FromBuffer(Buffer.from(contentHash)),
+  metadataHash: sha256FromBuffer(Buffer.from(fileMetadata)),
+});
 
-export function* mintTokenSaga(action) {
+const postToZora = (x) => {
+  const response = x;
+  return x;
+};
+
+function* mintTokenSaga() {
   try {
-    console.log({ payload: action.payload });
-    const response = yield call(postToZora, action.payload);
-    console.log("response in mintListener", response);
+    const fleekData = yield select((x) => x.userSessionState.fleekResponseData);
+    console.log({ fleekData });
+    const response = yield call(() => {
+      console.log("inside yield call(() => {}) fn::", { fleekData });
+      return fleekData;
+    });
     yield put(reportMintSuccess(response));
   } catch (error) {
     yield put(reportMintError(error));
     yield put(handleMintError());
   }
 }
+function* initializeMintSaga(action) {
+  yield put(mintToken());
+}
+
 export function* mintTokenWatcher() {
+  yield takeLatest(reportSuccess().type, initializeMintSaga);
   yield takeLatest(mintToken().type, mintTokenSaga);
 }
 

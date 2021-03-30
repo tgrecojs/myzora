@@ -4,26 +4,33 @@ import {
   reportError,
   reportSuccess,
   handleError,
-  setUserInfo
+  setUserInfo,
+  setChainId,
 } from "./reducer";
-import { initEthProvider, requestEthAccount } from "../../api/eth";
+import { initEthProvider } from "../../api/eth";
+import { fetchWallet } from "../../../Features/ConnectWallet/reducer";
 
-export function* formListenerSaga(action) {
+export function* handleProviderConnection() {
   try {
     console.log("inside formL");
     const response = yield call(initEthProvider);
     console.log("response in listener", { response });
     yield put(reportSuccess(response));
-    const userData = yield call(requestEthAccount)
-    yield put(setUserInfo(userData))
+    if (response.selectedAddress !== "") yield put(fetchWallet());
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError());
   }
 }
 
+function* handleNetworkDetails(action) {
+  const { chainId } = action.payload;
+  yield put(setChainId(chainId));
+}
+
 function* watchFetchMetamaskAccount() {
-  yield takeLatest(fetchProvider().type, formListenerSaga);
+  yield takeLatest(fetchProvider().type, handleProviderConnection);
+  yield takeLatest(reportSuccess().type, handleNetworkDetails);
 }
 
 export default watchFetchMetamaskAccount;
