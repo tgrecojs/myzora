@@ -56,7 +56,8 @@ export const {
     setWalletAddress,
     setEthProvider,
     setError: setEthProviderError,
-    setFleekResponseData,
+    setFleekMedia,
+    setFleekMetadata,
     setZoraResponseData,
   },
   selectors: {
@@ -64,7 +65,8 @@ export const {
     getWeb3,
     getChainId,
     getError: getEthProviderError,
-    getFleekResponseData,
+    getFleekMedia,
+    getFleekMetadata,
     getZoraResponseData,
   },
 } = autodux({
@@ -73,7 +75,8 @@ export const {
     error: null,
     walletAddress: [],
     chainId: null,
-    fleekResponseData: {},
+    fleekMedia: {},
+    fleekMetadata: {},
     zoraResponseData: {},
   },
   actions: {

@@ -7,14 +7,14 @@ import {
   setUserInfo,
   setChainId,
 } from "./reducer";
-import { initEthProvider } from "../../api/eth";
+import { initEthProvider, watchChainId } from "../../api/eth";
 import { fetchWallet } from "../../../Features/ConnectWallet/reducer";
 
 export function* handleProviderConnection() {
   try {
     console.log("inside formL");
     const response = yield call(initEthProvider);
-    console.log("response in listener", { response });
+    console.log("response in listener", { response, web3: window.provider });
     yield put(reportSuccess(response));
     if (response.selectedAddress !== "") yield put(fetchWallet());
   } catch (error) {

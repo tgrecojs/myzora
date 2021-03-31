@@ -12,41 +12,61 @@ import {
 import {
   constructMediaData,
   sha256FromBuffer,
+  sha256FromFile,
   generateMetadata,
   isMediaDataVerified,
 } from "@zoralabs/zdk";
 import {
-  setFleekResponseData,
-  getFleekResponseData,
+  setFleekMedia,
+  setFleekMetadata,
+  getFleekMedia,
   getZoraResponseData,
 } from "../../shared/hocs/withEthProvider/reducer";
-import fleekStorage from "@fleekhq/fleek-storage-js";
-//api req for zora
-const callZoraApi = (x) => new Promise((res) => res(x)).then((x) => x);
+import {
+  postMetadataToFleek,
+  postToFleekStorage,
+} from "../../shared/api/fleek";
+import { sanitizeString } from "../../shared/utils";
 
-const postToFleekStorage = async ({
-  tokenURI = "default file.jpg",
-  nftName = "default NFT name",
-}) => {
-  const response = await fleekStorage.upload({
-    apiKey: "+F0Pn/NgMA/bGj8d5gMGYQ==",
-    apiSecret: "f1h3qEGQLxAz4Qc8WF7wmThaem/4jabTa5IMZilb0OY=",
-    key: nftName,
-    data: tokenURI,
-  });
-  // The function returns the hash of the file, the publicUrl, the key and the bucket.
-  const data = await response;
-  console.log("response from fleek api ##", { response });
-  return data;
+const createZoraReqObject = async ({ tokenUri, nftName, imgSrc, price }) => {
+  const contentHash = await sha256FromFile(Buffer.from(tokenUri));
+  console.log({ contentHash });
+  const metadataHash = await sha256FromBuffer(
+    Buffer.from(JSON.stringify({ price, nftName, imgSrc }))
+  );
+  return { contentHash, metadataHash };
 };
 
 export function* fleekUploadSaga(action) {
   try {
-    console.log({ payload: action.payload });
-    const response = yield call(postToFleekStorage, action.payload);
-    console.log("response in listener", response);
-    yield put(reportSuccess(response));
-    yield put(setFleekResponseData(response));
+    const { tokenUri, price, description, creator, nftName } = action.payload;
+    const sanitizedName = sanitizeString(nftName);
+    const fleekMedia = yield call(postToFleekStorage, {
+      tokenUri,
+      sanitizedName,
+      creator,
+    });
+
+    const fleekMetadata = yield call(postMetadataToFleek, {
+      imgUrl: fleekMedia.publicUrl,
+      nftName,
+      sanitizedName,
+      price,
+      description,
+      creator,
+    });
+
+    yield put(
+      reportSuccess({
+        fleekMedia: {
+          ...fleekMedia,
+          nftName: sanitizedName,
+          price,
+          description,
+        },
+        fleekMetadata,
+      })
+    );
   } catch (error) {
     yield put(reportError(error));
     yield put(handleError(error));
@@ -65,19 +85,19 @@ const constructNft = ({
   metadataHash: sha256FromBuffer(Buffer.from(fileMetadata)),
 });
 
-const postToZora = (x) => {
-  const response = x;
-  return x;
+const postToZora = ({ tokenUri, metadataUri }) => {
+  console.log({ tokenUri, metadataUri });
+  return { status: "success!", tokenUri, metadataUri };
 };
 
 function* mintTokenSaga() {
   try {
-    const fleekData = yield select((x) => x.userSessionState.fleekResponseData);
-    console.log({ fleekData });
-    const response = yield call(() => {
-      console.log("inside yield call(() => {}) fn::", { fleekData });
-      return fleekData;
-    });
+    const tokenUri = yield select(
+      (x) => x.userSessionState.fleekMedia.publicUrl
+    );
+    const metadataUri = `${tokenUri}/metadata`;
+    console.log({ tokenUri, metadataUri });
+    const response = yield call(postToZora, { tokenUri, metadataUri });
     yield put(reportMintSuccess(response));
   } catch (error) {
     yield put(reportMintError(error));
@@ -85,6 +105,9 @@ function* mintTokenSaga() {
   }
 }
 function* initializeMintSaga(action) {
+  console.log("inside initializeMint:::", { action });
+  yield put(setFleekMedia(action.payload.fleekMedia));
+  yield put(setFleekMetadata(action.payload.fleekMetadata));
   yield put(mintToken());
 }
 

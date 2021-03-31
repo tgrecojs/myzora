@@ -1,6 +1,4 @@
-import autodux from "autodux";
 import dsm from "redux-dsm";
-
 
 const SEND_DATA = "sending data";
 const MINTING_TOKEN = "minting token";

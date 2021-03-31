@@ -1,48 +1,54 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { compose } from "ramda";
+import React, { useState, useRef } from "react";
+import { string, func, number, bool } from "prop-types";
 import { FormWrapper } from "../../shared/styled";
 
-const noop = () => {};
-
 const CreateNewNFT = ({
-  defaultName = "Default NFT Name",
-  defaultPrice = 0,
-  defaultmediaData = "",
+  name = "",
+  price = 0,
+  mediaName = "",
   onSubmit,
-  status,
+  descriptionText = "",
+  status = "idle",
+  userAddress = "",
 }) => {
-  const dispatch = useDispatch();
-  // console.log("dispatch", dispatch);
-  // const initForm = compose(dispatch, setForm);
+  const fileRef = useRef(null);
 
-  const [nftName, setNftName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [mediaData, setMediaData] = useState({});
-  const [fileName, setFileName] = useState("")
+  const [nftName, setNftName] = useState(name);
+  const [askingPrice, setAskingPrice] = useState(price);
+  const [description, setDescription] = useState(descriptionText);
+  const [fileName, setFileName] = useState(mediaName);
 
   const setter = (set) => (e) => {
     const { target } = e;
     const { value } = target;
-    console.log({ value, e });
     set(value);
   };
 
+  const resetRef = (ref) => (ref.current.value = null);
+
   const setFiles = (set) => (e) => {
     const { target } = e;
-    const { value } = target;
-    console.log({ value, e, files: value.files });
-    set(value.files[0]);
+    const { files } = target;
+    set(files[0]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ nftName, price, tokenUri: mediaData });
+    onSubmit({
+      nftName,
+      description,
+      price: askingPrice,
+      tokenUri: fileName,
+      creator: userAddress,
+    });
     setNftName("");
-    setPrice("");
-    setMediaData({name: ''});
+    setAskingPrice(0);
+    setDescription("");
+    resetRef(fileRef);
   };
-  return (
+  return status === "minting token" || status === "sending data" ? (
+    <p>minting...</p>
+  ) : (
     <FormWrapper as="form" onSubmit={handleSubmit} py={3}>
       <label htmlFor="name">NFT Name</label>
       <input
@@ -52,29 +58,33 @@ const CreateNewNFT = ({
         type="text"
         onChange={setter(setNftName)}
       />
-      <label htmlFor="price">Target Price</label>
+      <label htmlFor="description">Description</label>
       <input
-        value={price}
-        id="price"
-        name="price"
+        value={description}
+        id="description"
+        name="description"
+        type="text"
+        onChange={setter(setDescription)}
+      />
+      <label htmlFor="askingPrice">Asking Price</label>
+      <input
+        value={askingPrice}
+        id="askingPrice"
+        name="askingPrice"
         type="number"
-        onChange={setter(setPrice)}
+        onChange={setter(setAskingPrice)}
       />
-      <label htmlFor="price">Token URI (media)</label>
-      <input
-        value={fileName}
-        id="mediaData"
-        name="mediaData"
-        type="file"
-        onChange={e => {
-          console.log("e.target ####", e.target, e.target.files)
-          const files = e.target.files;
-          setMediaData(files)
-          console.log("files ##", files)
-          setFileName(files[0].name)
-        }}
-      />
+      <label htmlFor="nftMedia" name="nftMedia">
+        Token URI (media)
+      </label>
 
+      <input
+        id="nftMedia"
+        name="nftMedia"
+        type="file"
+        ref={fileRef}
+        onChange={setFiles(setFileName)}
+      />
       <button bg="blue" type="submit">
         Send Transaction
       </button>
@@ -82,4 +92,12 @@ const CreateNewNFT = ({
   );
 };
 
+CreateNewNFT.propTypes = {
+  name: string,
+  price: number,
+  mediaName: string,
+  onSubmit: func,
+  descriptionText: string,
+  isMinting: bool,
+};
 export default CreateNewNFT;
