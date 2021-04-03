@@ -55,13 +55,15 @@ export const {
     setChainId,
     setWalletAddress,
     setEthProvider,
-    setError: setEthProviderError,
+    setError,
     setFleekMedia,
     setFleekMetadata,
     setZoraResponseData,
+    setIsMetamaskInstalled
   },
   selectors: {
     getWalletAddress,
+    getIsMetamaskInstalled,
     getWeb3,
     getChainId,
     getError: getEthProviderError,
@@ -73,6 +75,7 @@ export const {
   slice: "userSessionInformation",
   initial: {
     error: null,
+    isMetamaskInstalled: {},
     walletAddress: [],
     chainId: null,
     fleekMedia: {},
