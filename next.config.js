@@ -12,6 +12,5 @@ module.exports = {
 
     return config;
   },
-  env,
-  distDir: "build",
+  env
 };
