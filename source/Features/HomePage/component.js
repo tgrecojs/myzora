@@ -1,6 +1,7 @@
 import ConnectWallet from "../ConnectWallet/component";
 import ViewNFT from "../ViewNFT/component";
 import { useSelector } from "react-redux";
+import { isEmpty } from "ramda";
 import {
   getFleekMedia,
   getFleekMetadata,
@@ -9,11 +10,10 @@ import {
 const HomePage = () => {
   const nftMedia = useSelector((x) => x.userSessionState.fleekMedia);
   const status = useSelector((x) => x.sendTransactionState.status);
-  console.log("inside HomePage Component::", { nftMedia, status });
   return (
     <>
       <ConnectWallet />
-      {nftMedia && (
+      {!isEmpty(nftMedia) && (
         <>
           <h3>Successful mint!</h3>
           <ViewNFT
