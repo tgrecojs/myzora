@@ -6,5 +6,6 @@
 .env
 
 node_modules
-.next/*
 
+.next/*
+build
