@@ -1,7 +1,10 @@
 import autodux from "autodux";
 import dsm from "redux-dsm";
+import { createSelector } from "reselect";
+const id = (x) => x;
 
-const SUCCESS = "success";
+const CONNECTED = "connected";
+const DISCONNECTED = "disconnected";
 const FETCHING = "fetching provider";
 const MINTING_TOKEN = "minting token";
 const FETCHING_ERROR = "error";
@@ -11,12 +14,12 @@ const IDLE = "idle";
 
 const fetchMetamaskProviderStates = [
   "initial",
-  IDLE,
+  DISCONNECTED,
   [
     "fetch provider",
     FETCHING,
-    ["report error", ERROR, ["handle error", IDLE]],
-    ["report success", SUCCESS],
+    ["report error", ERROR, ["handle error", DISCONNECTED]],
+    ["report success", CONNECTED, ["disconnect wallet", DISCONNECTED]],
   ],
 ];
 
@@ -27,22 +30,32 @@ const mintDSM = dsm({
 });
 
 const {
-  actionCreators: { fetchProvider, reportError, reportSuccess, handleError },
+  actionCreators: {
+    fetchProvider,
+    reportError,
+    reportSuccess,
+    handleError,
+    disconnectWallet,
+  },
   reducer,
 } = mintDSM;
 
-const txnPayload = ({ sendTransactionState }) => sendTransactionState.status;
-
-const txnStatus = ({ sendTransactionState }) => sendTransactionState.status;
+const getConnectionStatus = ({ metamaskProviderState }) =>
+  metamaskProviderState.status;
+const getConnectionPayload = ({ metamaskProviderState }) =>
+  metamaskProviderState.payload;
 
 export {
+  CONNECTED,
+  DISCONNECTED,
+  getConnectionStatus,
+  getConnectionPayload,
   fetchProvider,
   reportError,
   reportSuccess,
   handleError,
+  disconnectWallet,
   reducer,
-  txnStatus,
-  txnPayload,
 };
 
 const ethNetworkLookup = { 1: "mainnet", 3: "ropsten", 4: "rinkeby" };
@@ -59,9 +72,10 @@ export const {
     setFleekMedia,
     setFleekMetadata,
     setZoraResponseData,
-    setIsMetamaskInstalled
+    setIsMetamaskInstalled,
   },
   selectors: {
+    getChainName,
     getWalletAddress,
     getIsMetamaskInstalled,
     getWeb3,
@@ -72,7 +86,7 @@ export const {
     getZoraResponseData,
   },
 } = autodux({
-  slice: "userSessionInformation",
+  slice: "userSessionState",
   initial: {
     error: null,
     isMetamaskInstalled: {},
@@ -88,9 +102,12 @@ export const {
       chainId: payload,
       chainName: ethNetworkLookup[parseInt(payload)],
     }),
-    setUserInfo: (s,x) => ({ ...s, userInfo: x }),
+    setUserInfo: (s, x) => ({ ...s, userInfo: x }),
   },
-  selectors: {},
+  selectors: {
+    getWalletAddress: (s = { walletAddress: [""] }) => s.walletAddress[0],
+    getChainName: (s) => s.chainName,
+  },
 });
 
 export default mintDSM;

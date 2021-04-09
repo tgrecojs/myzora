@@ -10,6 +10,7 @@ import {
   SUCCESS,
   ERROR,
   IDLE,
+  web3Reducer,
 } from "./reducer";
 
 const defaultState = {
@@ -17,7 +18,26 @@ const defaultState = {
   status: "idle",
 };
 
+const defaultmetamaskProviderState = {
+  error: null,
+  isMetamaskInstalled: {},
+  walletAddress: [],
+  chainId: null,
+  fleekMedia: {},
+  fleekMetadata: {},
+  zoraResponseData: {},
+};
 const createState = (state = defaultState) => ({ ...state });
+
+describe("web3Reducer", async (assert) => {
+  const setup = web3Reducer();
+  assert({
+    given: "no args",
+    should: "return the default state",
+    actual: setup.toString() === defaultmetamaskProviderState.toString(),
+    expected: true,
+  });
+});
 
 describe("metamaskProviderReducer", async (assert) => {
   const setup = reducer(undefined);
@@ -63,7 +83,7 @@ describe("metamaskProviderReducer", async (assert) => {
   assert({
     given: "reportError action",
     should: "should not work when status is success",
-    actual: reducer(successSetup, reportError()).status === 'success',
+    actual: reducer(successSetup, reportError()).status === "success",
     expected: true,
   });
 });

@@ -29,10 +29,8 @@ export function* fetchAccountSaga() {
 function* fetchSuccessSaga(action) {
   yield put(setWalletAddress(action.payload));
 }
-const reloadPage = () => window.location.reload();
-
 function* handleReloadSaga() {
-  yield call(reloadPage);
+  yield call(() => 'hello');
 }
 
 function* watchFetchMetamaskAccount() {

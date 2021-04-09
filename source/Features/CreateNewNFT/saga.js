@@ -37,10 +37,33 @@ const createZoraReqObject = async ({ tokenUri, nftName, imgSrc, price }) => {
   return { contentHash, metadataHash };
 };
 
+const createMetadata = ({
+  name = "default NFT name",
+  description = "default NFT description",
+  mimeType = "image/default",
+}) => ({
+  version: `${name}-${new Date().toUTCString()}`,
+  name,
+  description,
+  mimeType,
+});
+
+const sampleVersion = "zora-20210101";
+
+const hashString = str => sha256FromBuffer(''.concat(Buffer.from(str)))
 export function* fleekUploadSaga(action) {
   try {
-    const { tokenUri, price, description, creator, nftName } = action.payload;
+    const {
+      tokenUri,
+      price,
+      description,
+      creator,
+      nftName,
+      mimeType,
+    } = action.payload;
+    console.log({ mimeType });
     const sanitizedName = sanitizeString(nftName);
+
     const fleekMedia = yield call(postToFleekStorage, {
       tokenUri,
       sanitizedName,
@@ -55,6 +78,16 @@ export function* fleekUploadSaga(action) {
       description,
       creator,
     });
+
+    const metadataJSON = yield generateMetadata(sampleVersion, {
+      name: nftName,
+      mimeType,
+      description,
+      version: sampleVersion,
+    });
+
+    const metadataHash = hashString(metadataJSON)
+    console.log({ metadataJSON, metadataHash });
 
     yield put(
       reportSuccess({

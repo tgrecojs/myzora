@@ -12,12 +12,13 @@ _state,
   return response;
 };
 
-const withWeb3Provider = (Component) => ({ onConnectProvider, ...props }) => {
+const withWeb3Provider = (Component) => ({ initializeWeb3, ...props }) => {
   useEffect(() => {
-    onConnectProvider();
+    initializeWeb3();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  console.log({props})
   return <Component {...props} />;
 };
 

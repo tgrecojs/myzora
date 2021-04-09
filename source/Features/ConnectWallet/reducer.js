@@ -28,7 +28,7 @@ const {
     fetchWallet,
     reportError,
     reportSuccess,
-    signOut: disconnectWallet,
+    disconnectWallet: disconnectWallet,
     handleError,
   },
   reducer,

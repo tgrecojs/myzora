@@ -32,6 +32,8 @@ const CreateNewNFT = ({
     set(files[0]);
   };
 
+  console.log({ fileName });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
@@ -39,6 +41,7 @@ const CreateNewNFT = ({
       description,
       price: askingPrice,
       tokenUri: fileName,
+      mimeType: fileName.type,
       creator: userAddress,
     });
     setNftName("");
@@ -46,9 +49,7 @@ const CreateNewNFT = ({
     setDescription("");
     resetRef(fileRef);
   };
-  return status === "minting token" || status === "sending data" ? (
-    <p>minting...</p>
-  ) : (
+  return status === "mint ready" ? (
     <FormWrapper as="form" onSubmit={handleSubmit} py={3}>
       <label htmlFor="name">NFT Name</label>
       <input
@@ -89,6 +90,8 @@ const CreateNewNFT = ({
         Send Transaction
       </button>
     </FormWrapper>
+  ) : (
+    <p>minting...</p>
   );
 };
 

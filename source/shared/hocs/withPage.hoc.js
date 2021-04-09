@@ -7,7 +7,7 @@ import withLayout from "./withLayout/component";
 const withPage = (Component) =>
   compose(
     connect(null, {
-      onConnectProvider: fetchProvider,
+      initializeWeb3: fetchProvider,
     }),
     withEthProvider,
     withLayout

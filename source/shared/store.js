@@ -10,17 +10,15 @@ import { reducer as formReducer } from "../Features/CreateNewNFT/reducer";
 import rootSaga from "./sagas";
 import createSagaMiddleware from "@redux-saga/core";
 const exampleInitialState = {
-  web3State: ethProviderReducer(),
+  metamaskProviderState: ethProviderReducer(),
   userSessionState: userSessionReducer(),
-  sendTransactionState: formReducer(),
-  metamaskState: connectWalletReducer(),
+  sendTransactionState: formReducer()
 };
 
 export function initializeStore(initialState = exampleInitialState) {
   const sagaMiddleware = createSagaMiddleware();
   const rootReducer = combineReducers({
-    web3State: ethProviderReducer,
-    metamaskState: connectWalletReducer,
+    metamaskProviderState: ethProviderReducer,
     userSessionState: userSessionReducer,
     sendTransactionState: formReducer,
   });
