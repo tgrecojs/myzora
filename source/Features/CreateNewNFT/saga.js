@@ -1,4 +1,4 @@
-import { call, put, select, takeLatest } from "redux-saga/effects";
+import { call, put, select, takeLatest } from 'redux-saga/effects'
 import {
   sendTransaction,
   reportSuccess,
@@ -7,50 +7,47 @@ import {
   mintToken,
   reportMintSuccess,
   reportMintError,
-  handleMintError,
-} from "./reducer";
+  handleMintError
+} from './reducer'
 import {
   constructMediaData,
   sha256FromBuffer,
   sha256FromFile,
-  generateMetadata,
-  isMediaDataVerified,
-} from "@zoralabs/zdk";
+  generateMetadata
+} from '@zoralabs/zdk'
 import {
   setFleekMedia,
   setFleekMetadata,
   getFleekMedia,
-  getZoraResponseData,
-} from "../../shared/hocs/withEthProvider/reducer";
-import {
-  postMetadataToFleek,
-  postToFleekStorage,
-} from "../../shared/api/fleek";
-import { sanitizeString } from "../../shared/utils";
+  getZoraResponseData
+} from '../MetamaskAuth/reducer'
+import { postMetadataToFleek, postToFleekStorage } from '../../shared/api/fleek'
+import { sanitizeString } from '../../shared/utils'
 
 const createZoraReqObject = async ({ tokenUri, nftName, imgSrc, price }) => {
-  const contentHash = await sha256FromFile(Buffer.from(tokenUri));
-  console.log({ contentHash });
+  const contentHash = await sha256FromFile(Buffer.from(tokenUri))
+  console.log({ contentHash })
   const metadataHash = await sha256FromBuffer(
     Buffer.from(JSON.stringify({ price, nftName, imgSrc }))
-  );
-  return { contentHash, metadataHash };
-};
+  )
+  return { contentHash, metadataHash }
+}
 
 const createMetadata = ({
-  name = "default NFT name",
-  description = "default NFT description",
-  mimeType = "image/default",
+  name = 'default NFT name',
+  description = 'default NFT description',
+  mimeType = 'image/default'
 }) => ({
   version: `${name}-${new Date().toUTCString()}`,
   name,
   description,
-  mimeType,
-});
+  mimeType
+})
 
-const sampleVersion = "zora-20210101";
+const sampleVersion = 'zora-20210101'
 
-const hashString = str => sha256FromBuffer(''.concat(Buffer.from(str)))
+const hashString = (str) => sha256FromBuffer(''.concat(Buffer.from(str)))
+
 export function* fleekUploadSaga(action) {
   try {
     const {
@@ -59,16 +56,16 @@ export function* fleekUploadSaga(action) {
       description,
       creator,
       nftName,
-      mimeType,
-    } = action.payload;
-    console.log({ mimeType });
-    const sanitizedName = sanitizeString(nftName);
+      mimeType
+    } = action.payload
+    console.log({ mimeType })
+    const sanitizedName = sanitizeString(nftName)
 
     const fleekMedia = yield call(postToFleekStorage, {
       tokenUri,
       sanitizedName,
-      creator,
-    });
+      creator
+    })
 
     const fleekMetadata = yield call(postMetadataToFleek, {
       imgUrl: fleekMedia.publicUrl,
@@ -76,18 +73,19 @@ export function* fleekUploadSaga(action) {
       sanitizedName,
       price,
       description,
-      creator,
-    });
+      creator
+    })
 
+    // need to validate this data firt
     const metadataJSON = yield generateMetadata(sampleVersion, {
       name: nftName,
       mimeType,
       description,
-      version: sampleVersion,
-    });
+      version: sampleVersion
+    })
 
     const metadataHash = hashString(metadataJSON)
-    console.log({ metadataJSON, metadataHash });
+    console.log({ metadataJSON, metadataHash })
 
     yield put(
       reportSuccess({
@@ -95,62 +93,62 @@ export function* fleekUploadSaga(action) {
           ...fleekMedia,
           nftName: sanitizedName,
           price,
-          description,
+          description
         },
-        fleekMetadata,
+        fleekMetadata
       })
-    );
+    )
   } catch (error) {
-    yield put(reportError(error));
-    yield put(handleError(error));
+    yield put(reportError(error))
+    yield put(handleError(error))
   }
 }
 
 const constructNft = ({
-  tokenUri = "default ipfs token uri",
-  metadataUri = "default ipfs metdata uri",
-  contentHash = "default content hash",
-  fileMetadata,
+  tokenUri = 'default ipfs token uri',
+  metadataUri = 'default ipfs metdata uri',
+  contentHash = 'default content hash',
+  fileMetadata
 }) => ({
   tokenUri,
   metadataUri,
   contentHash: sha256FromBuffer(Buffer.from(contentHash)),
-  metadataHash: sha256FromBuffer(Buffer.from(fileMetadata)),
-});
+  metadataHash: sha256FromBuffer(Buffer.from(fileMetadata))
+})
 
 const postToZora = ({ tokenUri, metadataUri }) => {
-  console.log({ tokenUri, metadataUri });
-  return { status: "success!", tokenUri, metadataUri };
-};
+  console.log({ tokenUri, metadataUri })
+  return { status: 'success!', tokenUri, metadataUri }
+}
+
+function* initializeMintSaga(action) {
+  yield put(setFleekMedia(action.payload.fleekMedia))
+  yield put(setFleekMetadata(action.payload.fleekMetadata))
+  yield put(mintToken())
+}
 
 function* mintTokenSaga() {
   try {
     const tokenUri = yield select(
       (x) => x.userSessionState.fleekMedia.publicUrl
-    );
-    const metadataUri = `${tokenUri}/metadata`;
-    console.log({ tokenUri, metadataUri });
-    const response = yield call(postToZora, { tokenUri, metadataUri });
-    yield put(reportMintSuccess(response));
+    )
+    const metadataUri = `${tokenUri}/metadata`
+    console.log({ tokenUri, metadataUri })
+    const response = yield call(postToZora, { tokenUri, metadataUri })
+    yield put(reportMintSuccess(response))
   } catch (error) {
-    yield put(reportMintError(error));
-    yield put(handleMintError());
+    yield put(reportMintError(error))
+    yield put(handleMintError())
   }
-}
-function* initializeMintSaga(action) {
-  console.log("inside initializeMint:::", { action });
-  yield put(setFleekMedia(action.payload.fleekMedia));
-  yield put(setFleekMetadata(action.payload.fleekMetadata));
-  yield put(mintToken());
 }
 
 export function* mintTokenWatcher() {
-  yield takeLatest(reportSuccess().type, initializeMintSaga);
-  yield takeLatest(mintToken().type, mintTokenSaga);
+  yield takeLatest(reportSuccess().type, initializeMintSaga)
+  yield takeLatest(mintToken().type, mintTokenSaga)
 }
 
 function* watchFetchMetamaskAccount() {
-  yield takeLatest(sendTransaction().type, fleekUploadSaga);
+  yield takeLatest(sendTransaction().type, fleekUploadSaga)
 }
 
-export default watchFetchMetamaskAccount;
+export default watchFetchMetamaskAccount

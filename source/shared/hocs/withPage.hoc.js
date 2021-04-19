@@ -1,16 +1,17 @@
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { fetchProvider } from "./withEthProvider/reducer";
-import withEthProvider from "./withEthProvider/component";
-import withLayout from "./withLayout/component";
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { establishConnection } from './withWeb3/reducer'
+
+import withMetamask from './withWeb3/component'
+import withLayout from './withLayout/component'
 
 const withPage = (Component) =>
   compose(
     connect(null, {
-      initializeWeb3: fetchProvider,
+      initializeWeb3: establishConnection
     }),
-    withEthProvider,
+    withMetamask,
     withLayout
-  )(Component);
+  )(Component)
 
-export default withPage;
+export default withPage

@@ -1,55 +1,55 @@
-import React, { useState, useRef } from "react";
-import { string, func, number, bool } from "prop-types";
-import { FormWrapper } from "../../shared/styled";
+import React, { useState, useRef } from 'react'
+import { string, func, number, bool } from 'prop-types'
+import { FormWrapper } from '../../shared/styled'
 
 const CreateNewNFT = ({
-  name = "",
+  name = '',
   price = 0,
-  mediaName = "",
+  mediaName = '',
   onSubmit,
-  descriptionText = "",
-  status = "idle",
-  userAddress = "",
+  descriptionText = '',
+  status = 'idle',
+  userAddress = ''
 }) => {
-  const fileRef = useRef(null);
+  const fileRef = useRef(null)
 
-  const [nftName, setNftName] = useState(name);
-  const [askingPrice, setAskingPrice] = useState(price);
-  const [description, setDescription] = useState(descriptionText);
-  const [fileName, setFileName] = useState(mediaName);
+  const [nftName, setNftName] = useState(name)
+  const [askingPrice, setAskingPrice] = useState(price)
+  const [description, setDescription] = useState(descriptionText)
+  const [fileName, setFileName] = useState(mediaName)
 
   const setter = (set) => (e) => {
-    const { target } = e;
-    const { value } = target;
-    set(value);
-  };
+    const { target } = e
+    const { value } = target
+    set(value)
+  }
 
-  const resetRef = (ref) => (ref.current.value = null);
+  const resetRef = (ref) => (ref.current.value = null)
 
   const setFiles = (set) => (e) => {
-    const { target } = e;
-    const { files } = target;
-    set(files[0]);
-  };
+    const { target } = e
+    const { files } = target
+    set(files[0])
+  }
 
-  console.log({ fileName });
+  console.log({ fileName })
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     onSubmit({
       nftName,
       description,
       price: askingPrice,
       tokenUri: fileName,
       mimeType: fileName.type,
-      creator: userAddress,
-    });
-    setNftName("");
-    setAskingPrice(0);
-    setDescription("");
-    resetRef(fileRef);
-  };
-  return status === "mint ready" ? (
+      creator: userAddress
+    })
+    setNftName('')
+    setAskingPrice(0)
+    setDescription('')
+    resetRef(fileRef)
+  }
+  return status === 'mint ready' ? (
     <FormWrapper as="form" onSubmit={handleSubmit} py={3}>
       <label htmlFor="name">NFT Name</label>
       <input
@@ -92,8 +92,8 @@ const CreateNewNFT = ({
     </FormWrapper>
   ) : (
     <p>minting...</p>
-  );
-};
+  )
+}
 
 CreateNewNFT.propTypes = {
   name: string,
@@ -101,6 +101,6 @@ CreateNewNFT.propTypes = {
   mediaName: string,
   onSubmit: func,
   descriptionText: string,
-  isMinting: bool,
-};
-export default CreateNewNFT;
+  isMinting: bool
+}
+export default CreateNewNFT

@@ -1,42 +1,42 @@
-import dsm from "redux-dsm";
+import dsm from 'redux-dsm'
 
-const SEND_DATA = "sending data";
-const MINTING_TOKEN = "minting token";
-const MINT_ERROR = "mint token error";
-const MINT_SUCCESS = "mint token success";
-const SEND_ERROR = "send data error";
-const IDLE = "idle";
-const MINT_READY = 'mint ready';
-const SEND_SUCCESS = "send data success";
+const SEND_DATA = 'sending data'
+const MINTING_TOKEN = 'minting token'
+const MINT_ERROR = 'mint token error'
+const MINT_SUCCESS = 'mint token success'
+const SEND_ERROR = 'send data error'
+const IDLE = 'idle'
+const MINT_READY = 'mint ready'
+const SEND_SUCCESS = 'send data success'
 
 const sendTxnStates = [
-  "initial",
+  'initial',
   MINT_READY,
   [
-    "send transaction",
+    'send transaction',
     SEND_DATA,
-    ["report error", SEND_ERROR, ["handle error", MINT_READY]],
+    ['report error', SEND_ERROR, ['handle error', MINT_READY]],
     [
-      "report success",
+      'report success',
       SEND_SUCCESS,
       [
-        "mint token",
+        'mint token',
         MINTING_TOKEN,
-        ["report mint error", MINT_ERROR, ["handle mint error", MINT_READY]],
-        ["report mint success", MINT_READY],
-      ],
-    ],
-  ],
-];
+        ['report mint error', MINT_ERROR, ['handle mint error', MINT_READY]],
+        ['report mint success', MINT_READY]
+      ]
+    ]
+  ]
+]
 
-const getTxnState = ({sendTransactionState}) => sendTransactionState;
-const getTxnStatus = x => getTxnState(x).status;
+const getTxnState = ({ sendTransactionState }) => sendTransactionState
+const getTxnStatus = (x) => getTxnState(x).status
 
 const mintDSM = dsm({
-  component: "CreateNewNFT",
-  description: "send NFT txn",
-  actionStates: sendTxnStates,
-});
+  component: 'CreateNewNFT',
+  description: 'send NFT txn',
+  actionStates: sendTxnStates
+})
 
 const {
   actionCreators: {
@@ -47,11 +47,10 @@ const {
     mintToken,
     reportMintSuccess,
     reportMintError,
-    handleMintError,
+    handleMintError
   },
-  reducer,
-} = mintDSM;
-
+  reducer
+} = mintDSM
 
 export {
   getTxnState,
@@ -67,6 +66,6 @@ export {
   reducer,
   SEND_DATA,
   SEND_ERROR
-};
+}
 
-export default mintDSM;
+export default mintDSM

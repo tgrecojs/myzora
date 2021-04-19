@@ -21,6 +21,14 @@
     }
   },
   "rules": {
+    "prettier/prettier/recommeded": [
+      "warn",
+      {
+        "singleQuote": true,
+        "semi": false,
+        "trailingComma": "none"
+      }
+    ],
     "linebreak-style": ["error", "unix"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
@@ -28,4 +36,3 @@
     "react/display-name": 0
   }
 }
-

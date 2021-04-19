@@ -1,38 +1,37 @@
-import fleekStorage from "@fleekhq/fleek-storage-js";
+import fleekStorage from '@fleekhq/fleek-storage-js'
 
 const postToFleekStorage = async ({
-  tokenUri = "default file.jpg",
-  sanitizedName = "default NFT name",
-  creator = "",
+  tokenUri = 'default file.jpg',
+  sanitizedName = 'default NFT name',
+  creator = ''
 }) => {
-
   const response = await fleekStorage.upload({
     apiKey: process.env.FLEEK_API_KEY,
     apiSecret: process.env.FLEEK_API_SECRET,
     key: `${sanitizedName}`, //?
     bucket: `tgrecojs-74725-team-bucket/zora-nft-assets/${creator}`,
-    data: tokenUri,
-  });
+    data: tokenUri
+  })
 
   // The function returns the hash of the file, the publicUrl, the key and the bucket.
-  const { hash, key, publicUrl } = await response;
-  return { hash, key, publicUrl };
-};
+  const { hash, key, publicUrl } = await response
+  return { hash, key, publicUrl }
+}
 
 const postMetadataToFleek = async ({
-  imgUrl = "default image URL",
-  nftName = "default NFT name",
+  imgUrl = 'default image URL',
+  nftName = 'default NFT name',
   price = 0,
-  description = "default NFT description string",
-  creator = "",
-  sanitizedName = "default sanitized name",
+  description = 'default NFT description string',
+  creator = '',
+  sanitizedName = 'default sanitized name'
 }) => {
-  console.log("tokenUri::", {
+  console.log('tokenUri::', {
     imgUrl,
     env: process.env,
     apiKey: process.env.FLEEK_API_KEY,
-    apiSecret: process.env.FLEEK_API_SECRET,
-  });
+    apiSecret: process.env.FLEEK_API_SECRET
+  })
   const response = await fleekStorage.upload({
     apiKey: process.env.FLEEK_API_KEY,
     apiSecret: process.env.FLEEK_API_SECRET,
@@ -44,12 +43,12 @@ const postMetadataToFleek = async ({
       price,
       description,
       sanitizedName,
-      creator,
-    }),
-  });
+      creator
+    })
+  })
   // The function returns the hash of the file, the publicUrl, the key and the bucket.
-  const data = await response;
-  return data;
-};
+  const data = await response
+  return data
+}
 
-export { postToFleekStorage, postMetadataToFleek };
+export { postToFleekStorage, postMetadataToFleek }

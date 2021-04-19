@@ -1,15 +1,14 @@
-import ConnectWallet from "../ConnectWallet/component";
-import ViewNFT from "../ViewNFT/component";
-import { useSelector } from "react-redux";
-import { isEmpty } from "ramda";
-import {
-  getFleekMedia,
-  getFleekMetadata,
-} from "../../shared/hocs/withEthProvider/reducer";
+import ConnectWallet from '../MetamaskAuth/component'
+import ViewNFT from '../ViewNFT/component'
+import { useSelector } from 'react-redux'
+import { isEmpty } from 'ramda'
+import { isMobile } from '../../shared/utils/mobile'
+import { getFleekMedia, getFleekMetadata } from '../MetamaskAuth/reducer'
 
-const HomePage = () => {
-  const nftMedia = useSelector((x) => x.userSessionState.fleekMedia);
-  const status = useSelector((x) => x.sendTransactionState.status);
+const HomePage = ({ viewportType }) => {
+  const nftMedia = useSelector((x) => x.userSessionState.fleekMedia)
+  const status = useSelector((x) => x.sendTransactionState.status)
+  console.log({ viewportType })
   return (
     <>
       <ConnectWallet />
@@ -26,7 +25,13 @@ const HomePage = () => {
         </>
       )}
     </>
-  );
-};
+  )
+}
 
-export default HomePage;
+HomePage.getInitialProps = async ({ req }) => {
+  const viewportType = isMobile(req)
+  console.log({ req, viewportType })
+  return { viewportType }
+}
+
+export default HomePage
